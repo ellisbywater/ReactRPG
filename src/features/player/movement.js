@@ -1,5 +1,5 @@
 import store from '../../config/store'
-import {SPRITE_STRIDE} from "../../config/constants";
+import {MAP_HEIGHT, MAP_WIDTH, SPRITE_SIZE, SPRITE_STRIDE} from "../../config/constants";
 
 export default function playerMovement(player) {
 
@@ -19,10 +19,11 @@ export default function playerMovement(player) {
     }
 
     function dispatchMove(direction) {
+        const oldPos = store.getState().player.position
         store.dispatch({
             type: "MOVE_PLAYER",
             payload: {
-                position: getNewPosition(direction)
+                position: observeBoundaries(oldPos, getNewPosition(direction))
             }
         })
     }
@@ -41,6 +42,12 @@ export default function playerMovement(player) {
             default:
                 console.log(e.keyCode)
         }
+    }
+
+    function observeBoundaries(oldPos, newPos) {
+        return (newPos[0] >= 0 && newPos[0] <= MAP_WIDTH - SPRITE_SIZE) &&
+            (newPos[1] >= 0 && newPos[1] <= MAP_HEIGHT - SPRITE_SIZE * 1.5)
+            ? newPos : oldPos
     }
 
     window.addEventListener('keydown', e => {
